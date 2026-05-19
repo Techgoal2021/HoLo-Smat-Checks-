@@ -24,10 +24,13 @@ from routers import sms, dashboard, payments, auth
 async def lifespan(app: FastAPI):
     """Initialize DB and seed data on startup."""
     print("🚀 HoLo backend starting up...")
-    await init_db()
-    async with AsyncSessionLocal() as db:
-        await seed_hotels(db)
-    print("✅ HoLo is ready. The Lagos Truth Engine is live.")
+    if os.getenv("VERCEL") != "1":
+        await init_db()
+        async with AsyncSessionLocal() as db:
+            await seed_hotels(db)
+        print("✅ HoLo is ready. The Lagos Truth Engine is live.")
+    else:
+        print("⚡ Running in Vercel Serverless mode. Skipping DB init.")
     yield
     print("🛑 HoLo shutting down.")
     await engine.dispose()
