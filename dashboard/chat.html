@@ -416,7 +416,9 @@
                 const sessionId = localStorage.getItem('holo_sid') || 'web_' + Math.random().toString(36).substring(7);
                 localStorage.setItem('holo_sid', sessionId);
 
-                const res = await fetch('/sms/incoming', {
+                const isVercel = window.location.hostname.includes('vercel.app');
+                const API_BASE = isVercel ? '/api' : '';
+                const res = await fetch(`${API_BASE}/sms/incoming`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -442,7 +444,9 @@
             const sessionId = localStorage.getItem('holo_sid');
             if (!sessionId) return;
             try {
-                const res = await fetch(`/sms/poll?phone=${sessionId}`, {
+                const isVercel = window.location.hostname.includes('vercel.app');
+                const API_BASE = isVercel ? '/api' : '';
+                const res = await fetch(`${API_BASE}/sms/poll?phone=${sessionId}`, {
                     headers: { 'ngrok-skip-browser-warning': 'true' }
                 });
                 const data = await res.json();

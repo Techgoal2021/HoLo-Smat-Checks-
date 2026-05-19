@@ -1,14 +1,6 @@
 {
   "rewrites": [
-    { "source": "/sms/(.*)", "destination": "/api/index" },
-    { "source": "/admin/(.*)", "destination": "/api/index" },
-    { "source": "/dashboard/stats", "destination": "/api/index" },
-    { "source": "/dashboard/hotels", "destination": "/api/index" },
-    { "source": "/dashboard/activity", "destination": "/api/index" },
-    { "source": "/dashboard/intelligence/update", "destination": "/api/index" },
-    { "source": "/payments/(.*)", "destination": "/api/index" },
-    { "source": "/auth/(.*)", "destination": "/api/index" },
-    { "source": "/health", "destination": "/api/index" },
+    { "source": "/api/(.*)", "destination": "/api/index" },
     { "source": "/", "destination": "/dashboard/index.html" },
     { "source": "/chat", "destination": "/dashboard/chat.html" },
     { "source": "/go", "destination": "/dashboard/go.html" },

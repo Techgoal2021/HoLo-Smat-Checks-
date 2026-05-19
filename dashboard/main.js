@@ -3,7 +3,8 @@
    The Truth-Led Booking Platform
    ════════════════════════════════════════ */
 
-const API_BASE = window.location.protocol.startsWith('http') ? '' : "http://127.0.0.1:8000";
+const isVercel = window.location.hostname.includes('vercel.app');
+const API_BASE = isVercel ? '/api' : (window.location.protocol.startsWith('http') ? '' : "http://127.0.0.1:8000");
 const REFRESH_INTERVAL = 15000; // 15 seconds
 
 // ── State ──────────────────────────────────────────────────────────────────

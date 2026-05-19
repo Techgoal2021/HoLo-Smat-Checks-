@@ -175,7 +175,8 @@
               const overlayLabel = document.getElementById('qr-overlay-label');
 
               // Detect base URL: prefer ngrok public URL from backend config
-              const apiBase = window.location.protocol.startsWith('http') ? '' : 'http://127.0.0.1:8000';
+              const isVercel = window.location.hostname.includes('vercel.app');
+              const apiBase = isVercel ? '/api' : (window.location.protocol.startsWith('http') ? '' : 'http://127.0.0.1:8000');
               let baseUrl = window.location.origin;
               if (baseUrl === 'null' || baseUrl.startsWith('file')) {
                 baseUrl = 'http://127.0.0.1:8000';

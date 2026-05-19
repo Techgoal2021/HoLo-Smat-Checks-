@@ -41,6 +41,7 @@ app = FastAPI(
     description="The Truth-Led Booking Platform for Lagos Professionals",
     version="1.0.0",
     lifespan=lifespan,
+    root_path="/api" if os.getenv("VERCEL") == "1" else "",
 )
 
 # CORS — allow dashboard frontend to call the API
