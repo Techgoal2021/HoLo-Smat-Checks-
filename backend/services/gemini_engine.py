@@ -22,17 +22,25 @@ def verify_power_status(hotel_name: str) -> str:
 
 settings = get_settings()
 
-# Initialize Gemini client
-client = genai.Client(api_key=settings.gemini_api_key)
-MODEL = "gemini-2.0-flash"
+client = None
 
+def get_client():
+    global client
+    if not client:
+        # Fallback to a dummy key so the app boots even if ENV is missing on Vercel
+        api_key = settings.gemini_api_key or "dummy_key_to_prevent_startup_crash"
+        client = genai.Client(api_key=api_key)
+    return client
+
+MODEL = "gemini-2.0-flash"
 
 def _call_gemini(prompt: str, retries: int = 1) -> str:
     """Make a Gemini API call with retry logic and absolute fallback."""
     import time
     for i in range(retries + 1):
         try:
-            response = client.models.generate_content(
+            c = get_client()
+            response = c.models.generate_content(
                 model=MODEL,
                 contents=prompt,
             )
@@ -63,7 +71,8 @@ async def gemini_parse_intent(message: str) -> dict:
     }}
     """
     try:
-        response = await client.aio.models.generate_content(
+        c = get_client()
+        response = await c.aio.models.generate_content(
             model=MODEL,
             contents=prompt,
             config=types.GenerateContentConfig(
@@ -226,7 +235,8 @@ def analyze_hotel_reputation(hotel_name: str, area: str) -> dict:
             config = types.GenerateContentConfig(
                 tools=[types.Tool(google_search=types.GoogleSearch())]
             )
-            response = client.models.generate_content(
+            c = get_client()
+            response = c.models.generate_content(
                 model=MODEL,
                 contents=prompt,
                 config=config
@@ -304,7 +314,8 @@ IMPORTANT RULES:
         config = types.GenerateContentConfig(
             tools=[types.Tool(google_search=types.GoogleSearch())]
         )
-        response = client.models.generate_content(
+        c = get_client()
+        response = c.models.generate_content(
             model=MODEL,
             contents=prompt,
             config=config
@@ -342,7 +353,8 @@ async def deep_audit_search(message: str, available_hotels: str = "") -> str:
         config = types.GenerateContentConfig(
             tools=[types.Tool(google_search=types.GoogleSearch())]
         )
-        response = await client.aio.models.generate_content(
+        c = get_client()
+        response = await c.aio.models.generate_content(
             model=MODEL,
             contents=prompt,
             config=config
