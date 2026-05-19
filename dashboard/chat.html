@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HoLo — Chat with Vera</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --wa-bg: #efeae2;
+            --wa-header: #008069;
+            --wa-bubble-user: #d9fdd3;
+            --wa-bubble-holo: #ffffff;
+            --wa-text: #111b21;
+            --wa-text-dim: #667781;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background-color: var(--wa-bg);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='%23c8bdb4' stroke-width='0.4' stroke-opacity='0.35'%3E%3Ccircle cx='10' cy='10' r='3'/%3E%3Ccircle cx='40' cy='10' r='3'/%3E%3Ccircle cx='70' cy='10' r='3'/%3E%3Ccircle cx='25' cy='25' r='2'/%3E%3Ccircle cx='55' cy='25' r='2'/%3E%3Ccircle cx='10' cy='40' r='3'/%3E%3Ccircle cx='40' cy='40' r='3'/%3E%3Ccircle cx='70' cy='40' r='3'/%3E%3Ccircle cx='25' cy='55' r='2'/%3E%3Ccircle cx='55' cy='55' r='2'/%3E%3Ccircle cx='10' cy='70' r='3'/%3E%3Ccircle cx='40' cy='70' r='3'/%3E%3Ccircle cx='70' cy='70' r='3'/%3E%3Cpath d='M22 8 Q25 4 28 8 Q25 12 22 8Z' fill='%23c8bdb4' fill-opacity='0.2'/%3E%3Cpath d='M52 38 Q55 34 58 38 Q55 42 52 38Z' fill='%23c8bdb4' fill-opacity='0.2'/%3E%3Cpath d='M12 58 Q15 54 18 58 Q15 62 12 58Z' fill='%23c8bdb4' fill-opacity='0.2'/%3E%3C/g%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: 80px 80px;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ── Header ── */
+        .header {
+            padding: 10px 16px;
+            background: var(--wa-header);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            z-index: 100;
+            flex-shrink: 0;
+        }
+        .back-arrow { font-size: 24px; cursor: pointer; padding: 4px; user-select: none; }
+        .avatar {
+            width: 38px; height: 38px;
+            background: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .avatar svg { width: 22px; height: 22px; }
+        .header-info { flex: 1; }
+        .header-info h1 { font-size: 16px; font-weight: 600; }
+        .header-info p  { font-size: 12px; opacity: 0.9; }
+
+        /* header action icons */
+        .header-actions { display: flex; align-items: center; gap: 2px; }
+        .hdr-btn {
+            background: none; border: none; color: white; cursor: pointer;
+            padding: 8px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.18s, transform 0.1s;
+        }
+        .hdr-btn:hover  { background: rgba(255,255,255,0.14); }
+        .hdr-btn:active { background: rgba(255,255,255,0.24); transform: scale(0.88); }
+        .hdr-btn svg { width: 22px; height: 22px; fill: white; }
+
+        /* ── Chat window ── */
+        #chat-window {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 16px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ── Bubbles ── */
+        .bubble {
+            max-width: 85%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.45;
+            position: relative;
+            box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
+            color: var(--wa-text);
+            margin-bottom: 2px;
+        }
+        .bubble::after {
+            content: ""; position: absolute; top: 0;
+            width: 0; height: 0; border: 8px solid transparent;
+        }
+        .bubble.holo {
+            align-self: flex-start;
+            background: var(--wa-bubble-holo);
+            border-top-left-radius: 0;
+            animation: bubbleInLeft 0.22s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+        }
+        .bubble.holo::after {
+            left: -8px;
+            border-right-color: var(--wa-bubble-holo);
+            border-top-color: var(--wa-bubble-holo);
+        }
+        .bubble.user {
+            align-self: flex-end;
+            background: var(--wa-bubble-user);
+            border-top-right-radius: 0;
+            animation: bubbleInRight 0.22s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+        }
+        .bubble.user::after {
+            right: -8px;
+            border-left-color: var(--wa-bubble-user);
+            border-top-color: var(--wa-bubble-user);
+        }
+        @keyframes bubbleInLeft {
+            from { opacity: 0; transform: translateX(-14px) scale(0.93); }
+            to   { opacity: 1; transform: translateX(0)     scale(1);    }
+        }
+        @keyframes bubbleInRight {
+            from { opacity: 0; transform: translateX(14px)  scale(0.93); }
+            to   { opacity: 1; transform: translateX(0)     scale(1);    }
+        }
+
+        .bubble .time {
+            display: block; font-size: 11px; text-align: right;
+            margin-top: 4px; color: var(--wa-text-dim);
+        }
+
+        /* ── Typing indicator (bouncing dots) ── */
+        .typing-bubble {
+            align-self: flex-start;
+            background: var(--wa-bubble-holo);
+            border-radius: 8px;
+            border-top-left-radius: 0;
+            padding: 11px 16px;
+            box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
+            display: none;
+            margin-bottom: 4px;
+            animation: bubbleInLeft 0.2s ease both;
+        }
+        .typing-dots { display: flex; align-items: center; gap: 5px; }
+        .typing-dot {
+            width: 8px; height: 8px;
+            background: var(--wa-text-dim);
+            border-radius: 50%;
+            animation: dotBounce 1.2s ease-in-out infinite;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.15s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.30s; }
+        @keyframes dotBounce {
+            0%, 55%, 100% { transform: translateY(0);   opacity: 0.55; }
+            27.5%          { transform: translateY(-8px); opacity: 1;    }
+        }
+
+        /* ── Input ── */
+        .input-container {
+            padding: 8px 10px;
+            display: flex; gap: 8px; align-items: center;
+            background: #f0f2f5; flex-shrink: 0; z-index: 100;
+        }
+        .input-wrapper {
+            flex: 1; background: white; border-radius: 24px;
+            padding: 4px 12px; display: flex; align-items: center;
+            min-height: 44px; box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+        input {
+            flex: 1; border: none; padding: 8px;
+            font-size: 16px; outline: none; background: transparent;
+            color: var(--wa-text);
+        }
+        .send-btn {
+            width: 48px; height: 48px;
+            background: var(--wa-header); border: none; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: white; flex-shrink: 0;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .send-btn:hover  { transform: scale(1.1); box-shadow: 0 4px 18px rgba(0,128,105,0.45); }
+        .send-btn:active { transform: scale(0.88); box-shadow: none; }
+        .send-btn svg { width: 22px; height: 22px; fill: white; transform: translateX(2px); }
+
+        /* ── Interactive option buttons ── */
+        .bot-text { margin-bottom: 10px; }
+        .interactive-options { display: flex; flex-direction: column; gap: 7px; margin: 8px 0; }
+        .opt-btn {
+            background: rgba(0,128,105,0.07);
+            border: 1px solid rgba(0,128,105,0.3);
+            color: var(--wa-header);
+            padding: 9px 13px; border-radius: 10px;
+            font-size: 0.88rem; font-weight: 600;
+            text-align: left; cursor: pointer;
+            transition: all 0.18s ease; width: 100%;
+        }
+        .opt-btn:hover { background: rgba(0,128,105,0.14); transform: translateX(3px); }
+
+        /* ── Modals ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 200;
+            display: none; align-items: flex-end; justify-content: center;
+            backdrop-filter: blur(3px);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: white;
+            border-radius: 24px 24px 0 0;
+            padding: 1.75rem 1.5rem 2rem;
+            width: 100%; max-width: 480px;
+            text-align: center;
+            animation: modalUp 0.3s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+        }
+        @keyframes modalUp {
+            from { opacity: 0; transform: translateY(60px); }
+            to   { opacity: 1; transform: translateY(0);    }
+        }
+        .modal-pill {
+            width: 36px; height: 4px; background: #e0e0e0;
+            border-radius: 2px; margin: 0 auto 1.5rem;
+        }
+        .modal-icon {
+            width: 62px; height: 62px;
+            background: rgba(0,128,105,0.1);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.1rem;
+        }
+        .modal-icon svg { width: 28px; height: 28px; fill: var(--wa-header); }
+        .modal h2 { font-size: 1.1rem; font-weight: 700; color: var(--wa-text); margin-bottom: 0.5rem; }
+        .modal p  { font-size: 0.855rem; color: var(--wa-text-dim); line-height: 1.65; margin-bottom: 1.4rem; }
+        .badge-soon {
+            display: inline-block;
+            background: rgba(0,128,105,0.1); color: var(--wa-header);
+            font-size: 0.68rem; font-weight: 700; letter-spacing: 1.5px;
+            text-transform: uppercase; padding: 3px 10px;
+            border-radius: 20px; margin-bottom: 1rem;
+        }
+        .modal-btn {
+            width: 100%; padding: 0.8rem; border-radius: 12px;
+            border: none; font-size: 0.9rem; font-weight: 600;
+            cursor: pointer; margin-bottom: 0.5rem;
+            transition: opacity 0.15s;
+        }
+        .modal-btn:hover { opacity: 0.88; }
+        .modal-btn.primary { background: var(--wa-header); color: white; }
+        .modal-btn.secondary { background: #f0f2f5; color: var(--wa-text); }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header { padding: 8px 12px; }
+            .bubble { max-width: 90%; font-size: 14px; }
+            .input-container { padding: 6px 8px; padding-bottom: calc(6px + env(safe-area-inset-bottom)); }
+            .send-btn { width: 42px; height: 42px; }
+        }
+        @media (max-width: 360px) {
+            .header-info h1 { font-size: 14px; }
+            .bubble { font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <span class="back-arrow" onclick="window.location.href='/'">←</span>
+        <div class="avatar">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 11.5L8.5 16L18 7" stroke="#008069" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="header-info">
+            <h1>Vera</h1>
+            <p>Verified &middot; Smart Checks Advisor</p>
+        </div>
+        <div class="header-actions">
+            <!-- Hotel Video Tour -->
+            <button class="hdr-btn" id="video-btn" onclick="openModal('video-modal')" title="Hotel Video Tour">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z"/>
+                </svg>
+            </button>
+            <!-- Call Hotel -->
+            <button class="hdr-btn" id="call-btn" onclick="openModal('call-modal')" title="Call Hotel">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.5 11.5 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.24 1.01l-2.21 2.21z"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div id="chat-window">
+        <div class="bubble holo">
+            Hi! I'm Vera from HoLo Smart Checks, your Verified Hotel Guide. How can I help you today?
+            <span class="time">12:00 PM</span>
+        </div>
+    </div>
+
+    <!-- Bouncing dots typing indicator -->
+    <div class="typing-bubble" id="typing-bubble">
+        <div class="typing-dots">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        </div>
+    </div>
+
+    <form class="input-container" id="chat-form">
+        <div class="input-wrapper">
+            <input type="text" id="user-input" placeholder="Message Vera..." autocomplete="off">
+        </div>
+        <button type="submit" class="send-btn">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+        </button>
+    </form>
+
+    <!-- Call Hotel Modal -->
+    <div class="modal-overlay" id="call-modal" onclick="handleOverlayClick(event,'call-modal')">
+        <div class="modal">
+            <div class="modal-pill"></div>
+            <div class="modal-icon">
+                <svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.5 11.5 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.24 1.01l-2.21 2.21z"/></svg>
+            </div>
+            <h2>Call Hotel Front Desk</h2>
+            <p>Ask Vera to recommend a hotel first. Once she does, tap this button to call their front desk directly and confirm your booking.</p>
+            <button class="modal-btn primary" onclick="closeModal('call-modal')">Got it, thanks Vera</button>
+            <button class="modal-btn secondary" onclick="closeModal('call-modal')">Dismiss</button>
+        </div>
+    </div>
+
+    <!-- Hotel Video Tour Modal -->
+    <div class="modal-overlay" id="video-modal" onclick="handleOverlayClick(event,'video-modal')">
+        <div class="modal">
+            <div class="modal-pill"></div>
+            <span class="badge-soon">Coming Soon</span>
+            <div class="modal-icon">
+                <svg viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z"/></svg>
+            </div>
+            <h2>Hotel Video Tours</h2>
+            <p>We're adding verified video walkthroughs for every listed hotel — so you see exactly what you're booking before you arrive. No surprises.</p>
+            <button class="modal-btn primary" onclick="closeModal('video-modal')">Can't wait!</button>
+            <button class="modal-btn secondary" onclick="closeModal('video-modal')">Dismiss</button>
+        </div>
+    </div>
+
+    <script>
+        const form      = document.getElementById('chat-form');
+        const input     = document.getElementById('user-input');
+        const chatWin   = document.getElementById('chat-window');
+        const typingBub = document.getElementById('typing-bubble');
+
+        /* ── Modal helpers ── */
+        function openModal(id)  { document.getElementById(id).classList.add('open'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+        function handleOverlayClick(e, id) { if (e.target === e.currentTarget) closeModal(id); }
+
+        /* ── Linkify ── */
+        function linkify(text) {
+            return text.replace(/(https?:\/\/[^\s<]+)/g,
+                '<a href="$1" target="_blank" rel="noopener" style="color:#008069;text-decoration:underline;word-break:break-all;">$1</a>');
+        }
+
+        /* ── Add bubble ── */
+        function addBubble(text, type) {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const div = document.createElement('div');
+            div.className = `bubble ${type}`;
+
+            const optionRegex = /(\d)\.\s+([^\n]+)/g;
+            const hasOptions  = type === 'holo' && text.match(optionRegex);
+
+            if (hasOptions) {
+                let cleanText = text.split(/\d\./)[0].trim();
+                let options = [], match;
+                while ((match = optionRegex.exec(text)) !== null) {
+                    options.push({ num: match[1], label: match[2] });
+                }
+                div.innerHTML = `
+                    <div class="bot-text">${linkify(cleanText.replace(/\n/g,'<br>'))}</div>
+                    <div class="interactive-options">
+                        ${options.map(o => `<button class="opt-btn" onclick="sendQuickReply('${o.num}')">${o.label}</button>`).join('')}
+                    </div>
+                    <span class="time">${timeStr}</span>`;
+            } else {
+                div.innerHTML = `${linkify(text.replace(/\n/g,'<br>'))} <span class="time">${timeStr}</span>`;
+            }
+
+            chatWin.appendChild(div);
+            chatWin.scrollTop = chatWin.scrollHeight;
+        }
+
+        window.sendQuickReply = (num) => { input.value = num; form.dispatchEvent(new Event('submit')); };
+
+        /* ── Show / hide typing ── */
+        function showTyping() {
+            typingBub.style.display = 'block';
+            chatWin.scrollTop = chatWin.scrollHeight;
+        }
+        function hideTyping() { typingBub.style.display = 'none'; }
+
+        /* ── Submit ── */
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const msg = input.value.trim();
+            if (!msg) return;
+            addBubble(msg, 'user');
+            input.value = '';
+            showTyping();
+
+            try {
+                const sessionId = localStorage.getItem('holo_sid') || 'web_' + Math.random().toString(36).substring(7);
+                localStorage.setItem('holo_sid', sessionId);
+
+                const res = await fetch('/sms/incoming', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'ngrok-skip-browser-warning': 'true'
+                    },
+                    body: new URLSearchParams({ from: sessionId, text: msg })
+                });
+
+                const data = await res.json();
+                setTimeout(() => {
+                    hideTyping();
+                    if (data.reply) addBubble(data.reply, 'holo');
+                }, 650);
+            } catch (err) {
+                hideTyping();
+                addBubble('⚠️ Connection error. Please try again.', 'holo');
+            }
+        };
+
+        /* ── Poll for push messages ── */
+        let lastReceived = '';
+        async function pollMessages() {
+            const sessionId = localStorage.getItem('holo_sid');
+            if (!sessionId) return;
+            try {
+                const res = await fetch(`/sms/poll?phone=${sessionId}`, {
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
+                const data = await res.json();
+                if (data.reply && data.reply !== lastReceived) {
+                    addBubble(data.reply, 'holo');
+                    lastReceived = data.reply;
+                }
+            } catch (_) {}
+        }
+        setInterval(pollMessages, 6000);
+    </script>
+</body>
+</html>

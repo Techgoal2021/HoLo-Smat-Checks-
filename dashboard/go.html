@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>HoLo — Smart Checks</title>
+  <meta name="description" content="HoLo: Truth-led hotel verification for Lagos professionals. Chat or browse verified hotel scores." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #070D1C;
+      --cyan: #00CFFF;
+      --cyan-glow: rgba(0, 207, 255, 0.15);
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.25rem;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Background glow */
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 50% 40% at 50% 30%, rgba(0, 207, 255, 0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 50% at 30% 70%, rgba(0, 100, 180, 0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      max-width: 400px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2.5rem;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Logo */
+    .logo-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .badge {
+      width: 72px;
+      height: 72px;
+      border: 2.5px solid var(--cyan);
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 38%, #0D2A55, #070D1C);
+      box-shadow: 0 0 30px rgba(0, 207, 255, 0.5), inset 0 0 14px rgba(0, 207, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wordmark {
+      text-align: center;
+    }
+
+    .name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .name .w { color: #fff; }
+    .name .c { color: var(--cyan); text-shadow: 0 0 20px rgba(0, 207, 255, 0.7); }
+
+    .sub {
+      font-size: 11px;
+      font-weight: 600;
+      color: #4A6080;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .tagline {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      text-align: center;
+      line-height: 1.6;
+      max-width: 320px;
+    }
+
+    /* Choice cards */
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .choice {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
+      background: rgba(15, 26, 48, 0.8);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      text-decoration: none;
+      color: white;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .choice::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0, 207, 255, 0.04), transparent);
+      pointer-events: none;
+      transition: opacity 0.3s;
+      opacity: 0;
+    }
+
+    .choice:hover::before,
+    .choice:active::before {
+      opacity: 1;
+    }
+
+    .choice:hover {
+      border-color: rgba(0, 207, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .choice:active {
+      transform: scale(0.98);
+    }
+
+    .choice-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .choice-icon.chat {
+      background: linear-gradient(135deg, rgba(0, 207, 255, 0.15), rgba(0, 100, 180, 0.2));
+      border: 1px solid rgba(0, 207, 255, 0.25);
+    }
+
+    .choice-icon.dash {
+      background: linear-gradient(135deg, rgba(0, 135, 81, 0.15), rgba(0, 168, 107, 0.2));
+      border: 1px solid rgba(0, 135, 81, 0.25);
+    }
+
+    .choice-text h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .choice-text p {
+      font-size: 0.78rem;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .choice-arrow {
+      margin-left: auto;
+      color: #334155;
+      font-size: 1.2rem;
+      transition: transform 0.3s, color 0.3s;
+    }
+
+    .choice:hover .choice-arrow {
+      color: var(--cyan);
+      transform: translateX(4px);
+    }
+
+    /* Footer */
+    .foot {
+      color: #334155;
+      font-size: 0.7rem;
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    .foot strong { color: #475569; }
+
+    /* Responsive */
+    @media (max-width: 360px) {
+      .badge { width: 60px; height: 60px; }
+      .badge svg { width: 24px !important; height: 24px !important; }
+      .name { font-size: 26px; }
+      .tagline { font-size: 0.85rem; }
+      .choice { padding: 1rem 1.2rem; }
+      .choice-icon { width: 42px; height: 42px; font-size: 1.3rem; border-radius: 12px; }
+      .choice-text h2 { font-size: 0.95rem; }
+      .choice-text p { font-size: 0.72rem; }
+    }
+
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      body { padding-bottom: calc(2rem + env(safe-area-inset-bottom)); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Logo -->
+    <div class="logo-block">
+      <div class="badge">
+        <svg width="30" height="30" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 11.5L8.5 16L18 7" stroke="#00CFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="wordmark">
+        <div class="name"><span class="w">Ho</span><span class="c">Lo</span></div>
+        <div class="sub">Smart Checks</div>
+      </div>
+    </div>
+
+    <p class="tagline">Verified hotel scores for Lagos professionals. What would you like to do?</p>
+
+    <!-- Choices -->
+    <div class="choices">
+      <a href="/chat" class="choice" id="go-chat">
+        <div class="choice-icon chat">💬</div>
+        <div class="choice-text">
+          <h2>Chat with HoLo</h2>
+          <p>Ask for hotel recommendations and book instantly</p>
+        </div>
+        <span class="choice-arrow">→</span>
+      </a>
+
+      <a href="/" class="choice" id="go-dashboard">
+        <div class="choice-icon dash">📊</div>
+        <div class="choice-text">
+          <h2>Browse Hotels</h2>
+          <p>View live Truth Scores and area breakdowns</p>
+        </div>
+        <span class="choice-arrow">→</span>
+      </a>
+    </div>
+
+    <div class="foot">
+      Verified hotel scores for Lagos professionals
+    </div>
+  </div>
+</body>
+</html>

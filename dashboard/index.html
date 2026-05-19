@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HoLo Smart Checks — Lagos Hotel Verification Dashboard</title>
+  <meta name="description"
+    content="Real-time hotels & lodges Truth Scores for Lagos professionals. Power, Wi-Fi, and quiet — verified by real guests." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <!-- QR Code generator (client-side, no external API needed) -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    .holo-logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+    }
+
+    .holo-badge {
+      width: 60px;
+      height: 60px;
+      border: 2px solid #00CFFF;
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 38%, #0D2A55, #070D1C);
+      box-shadow: 0 0 24px rgba(0, 207, 255, 0.5), 0 0 8px rgba(0, 207, 255, 0.3), inset 0 0 14px rgba(0, 207, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .holo-wordmark {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+    }
+
+    .holo-name {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .holo-name .w {
+      color: #ffffff;
+    }
+
+    .holo-name .c {
+      color: #00CFFF;
+      text-shadow: 0 0 18px rgba(0, 207, 255, 0.8), 0 0 40px rgba(0, 207, 255, 0.4);
+    }
+
+    .c {
+      color: #00CFFF;
+      text-shadow: 0 0 18px rgba(0, 207, 255, 0.8), 0 0 40px rgba(0, 207, 255, 0.4);
+    }
+
+    .holo-sub {
+      font-size: 11px;
+      font-weight: 600;
+      color: #4A6080;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ── Navbar ── -->
+  <nav class="navbar" id="navbar">
+    <a class="holo-logo" href="/" id="nav-logo">
+      <div class="holo-badge">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 11.5L8.5 16L18 7" stroke="#00CFFF" stroke-width="2.2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="holo-wordmark">
+        <div class="holo-name"><span class="w">Ho</span><span class="c">Lo</span></div>
+        <div class="holo-sub">Smart Checks</div>
+      </div>
+    </a>
+    <div class="nav-links" id="nav-links">
+      <a href="#hero" class="nav-link">Home</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#hotels-section" class="nav-link">Hotels</a>
+      <a href="#how-it-works" class="nav-link">How It Works</a>
+      <a href="./chat.html" class="nav-link highlight">HoLo Chat</a>
+    </div>
+    <div class="nav-right">
+      <div class="nav-live">
+        <span class="live-dot"></span>
+        <span>Live Data</span>
+      </div>
+      <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── Mobile Menu ── -->
+  <div class="mobile-menu" id="mobile-menu">
+    <div class="mobile-menu-content">
+      <a href="#hero" class="mobile-link">Home</a>
+      <a href="#about" class="mobile-link">About</a>
+      <a href="#hotels-section" class="mobile-link">Hotels</a>
+      <a href="#how-it-works" class="mobile-link">How It Works</a>
+      <a href="/chat" class="mobile-link highlight">HoLo Chat</a>
+    </div>
+  </div>
+
+  <!-- ── Hero ── -->
+  <section class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-main-flex">
+        <div class="hero-text-block">
+          <div class="hero-logo-box" style="margin-bottom: 2.5rem;">
+            <div class="holo-badge"
+              style="width: 100px; height: 100px; border-width: 3px; box-shadow: 0 0 40px rgba(0, 207, 255, 0.6);">
+              <svg width="44" height="44" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 11.5L8.5 16L18 7" stroke="#00CFFF" stroke-width="2.5" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+            </div>
+          </div>
+          <h1 class="hero-title"><span class="w">Ho</span><span class="c">Lo</span> Smart Checks</h1>
+          <p class="hero-subtitle">Real-time verified hotel scores powered by AI + Guest Reports. Scan to start an
+            honest search via our <strong>HoLo Chat</strong> mobile portal.</p>
+        </div>
+
+        <div class="hero-qr-box">
+          <div class="qr-wrapper" id="qr-container"
+            style="background: white; padding: 1.5rem; border-radius: 20px; box-shadow: 0 0 40px rgba(0, 207, 255, 0.4);">
+            <!-- QR Code rendered client-side by QRCode.js -->
+            <div id="qr-code-canvas"
+              style="width: 260px; height: 260px; display: flex; align-items: center; justify-content: center;">
+              <div style="color:#999; font-size:0.85rem; text-align:center;">Generating QR...</div>
+            </div>
+            <div class="qr-overlay" style="bottom: -1rem; background: var(--bg-deep); border: 2px solid var(--cyan);">
+              <div class="qr-status-dot"></div>
+              <span style="color: var(--cyan);" id="qr-overlay-label">Scan to Open HoLo</span>
+            </div>
+          </div>
+          <div class="qr-caption" style="margin-top: 2rem;">No App Needed. Just Scan &amp; Chat.</div>
+
+          <div class="qr-share-actions">
+            <button class="share-btn copy" id="copy-link-btn">
+              <span class="icon">🔗</span> Copy
+            </button>
+            <button class="share-btn whatsapp" id="share-wa-btn">
+              <span class="icon">💬</span> WhatsApp
+            </button>
+            <button class="share-btn" id="share-more-btn">
+              <span class="icon">📤</span> Share
+            </button>
+          </div>
+
+          <script>
+            window.addEventListener('load', async () => {
+              const qrContainer = document.getElementById('qr-code-canvas');
+              const copyBtn = document.getElementById('copy-link-btn');
+              const waBtn = document.getElementById('share-wa-btn');
+              const shareMoreBtn = document.getElementById('share-more-btn');
+              const overlayLabel = document.getElementById('qr-overlay-label');
+
+              // Detect base URL: prefer ngrok public URL from backend config
+              const apiBase = window.location.protocol.startsWith('http') ? '' : 'http://127.0.0.1:8000';
+              let baseUrl = window.location.origin;
+              if (baseUrl === 'null' || baseUrl.startsWith('file')) {
+                baseUrl = 'http://127.0.0.1:8000';
+              }
+
+              try {
+                const res = await fetch(`${apiBase}/dashboard/config`);
+                const config = await res.json();
+                if (config.public_url) {
+                  baseUrl = config.public_url;
+                  overlayLabel.textContent = 'Scan to Join Live';
+                }
+              } catch (err) {
+                console.warn('Could not fetch public config, using local origin.');
+              }
+
+              const chatUrl = baseUrl + '/go';
+              console.log('QR Code pointing to:', chatUrl);
+
+              // Generate QR code client-side (no external API)
+              qrContainer.innerHTML = '';
+              new QRCode(qrContainer, {
+                text: chatUrl,
+                width: 260,
+                height: 260,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+              });
+
+              // Copy Link
+              copyBtn.onclick = () => {
+                navigator.clipboard.writeText(chatUrl).then(() => {
+                  const orig = copyBtn.innerHTML;
+                  copyBtn.innerHTML = '<span class="icon">✅</span> Copied!';
+                  copyBtn.classList.add('success');
+                  setTimeout(() => { copyBtn.innerHTML = orig; copyBtn.classList.remove('success'); }, 2000);
+                });
+              };
+
+              // WhatsApp Share
+              waBtn.onclick = () => {
+                const text = encodeURIComponent(`Check out HoLo — Verified hotel stays for Lagos professionals: ${chatUrl}`);
+                window.open(`https://wa.me/?text=${text}`, '_blank');
+              };
+
+              // Native Share
+              shareMoreBtn.onclick = async () => {
+                if (navigator.share) {
+                  try {
+                    await navigator.share({
+                      title: 'HoLo Verified Stays',
+                      text: 'Check out HoLo — Truth-Led hotel searches for Lagos professionals.',
+                      url: chatUrl,
+                    });
+                  } catch (err) { console.log('Share cancelled:', err); }
+                } else {
+                  copyBtn.click();
+                }
+              };
+            });
+          </script>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-row" id="stats-row">
+        <div class="stat-card">
+          <div class="stat-number" id="stat-num-hotels">0</div>
+          <div class="stat-label">Verified Lodges</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="stat-num-votes">0</div>
+          <div class="stat-label">Truth Votes</div>
+        </div>
+        <div class="stat-card highlight" onclick="triggerDemoVote()" style="cursor: pointer;">
+          <div class="stat-number" id="stat-num-avg">0</div>
+          <div class="stat-label">Avg. Score</div>
+        </div>
+        <div class="stat-card" id="stat-verified">
+          <div class="stat-number" id="stat-num-verified">0</div>
+          <div class="stat-label">Verified ≥80 ✅</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── About HoLo (Android Style - Minimal) ── -->
+  <section class="about-section reveal" id="about">
+    <div class="about-container">
+      <span class="about-label">The Truth-Led Engine</span>
+      <h2 class="about-title">Lagos hotels often hide the truth. <span>HoLo brings it to light.</span></h2>
+      <p class="about-text" style="margin-bottom: 8rem;">
+        Powered by real-time guest reports and Gemini AI, we verify the things that matter most to professionals: stable
+        power, high-speed Wi-Fi, and genuine peace of mind.
+      </p>
+
+      <div class="tech-grid">
+        <div class="tech-card reveal">
+          <span class="tech-icon">🤖</span>
+          <h3>AI Integrity</h3>
+          <p>Gemini AI cross-references every report to eliminate bias and fake reviews instantly.</p>
+        </div>
+        <div class="tech-card reveal">
+          <span class="tech-icon">📶</span>
+          <h3>Verified Signal</h3>
+          <p>Real-time Wi-Fi speed and signal strength tests verified by guests on-site.</p>
+        </div>
+        <div class="tech-card reveal">
+          <span class="tech-icon">⚡</span>
+          <h3>True Power</h3>
+          <p>Live generator schedules and inverter status. We tell you what "24/7 Power" really means.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Main Content ── -->
+  <main class="main-content">
+
+    <!-- Area Breakdown -->
+    <section class="section" id="vibe-map">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Lagos Vibe Map</h2>
+          <p class="section-subtitle">Area-by-area Truth Score breakdown</p>
+        </div>
+        <button class="intel-btn" id="intel-scan-btn" onclick="triggerLiveIntel()">
+          <span class="intel-icon">📡</span>
+          <span id="intel-btn-text">Deep Intel Scan</span>
+        </button>
+      </div>
+      <div class="area-grid" id="area-grid">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+    <!-- Hotel Cards + Live Feed side by side -->
+    <div class="two-col-layout">
+
+      <!-- Hotel Cards -->
+      <section class="section hotels-section" id="hotels-section">
+        <div class="section-header">
+          <h2 class="section-title">Hotel Truth Scores</h2>
+          <div class="filter-pills" id="filter-pills">
+            <button class="pill active" data-area="all" id="pill-all">All</button>
+            <button class="pill" data-area="Yaba" id="pill-yaba">Yaba</button>
+            <button class="pill" data-area="Lekki" id="pill-lekki">Lekki</button>
+            <button class="pill" data-area="Victoria Island" id="pill-vi">VI</button>
+            <button class="pill" data-area="Ikeja" id="pill-ikeja">Ikeja</button>
+            <button class="pill" data-area="Surulere" id="pill-surulere">Surulere</button>
+          </div>
+        </div>
+        <div class="hotel-grid" id="hotel-grid">
+          <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading verified hotels...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Live Activity Feed -->
+      <section class="section feed-section" id="feed-section">
+        <div class="section-header">
+          <h2 class="section-title">Live Votes</h2>
+          <span class="live-badge">
+            <span class="live-dot small"></span> Real-time
+          </span>
+        </div>
+        <div class="activity-feed" id="activity-feed">
+          <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Listening for votes...</p>
+          </div>
+        </div>
+
+        <!-- SMS Demo Box -->
+        <div class="sms-demo-box" id="sms-demo-box">
+          <div class="sms-demo-title">📱 Try It Now</div>
+          <p class="sms-demo-text">Send an SMS to test HoLo:</p>
+          <div class="sms-bubble user">I'm looking for a place in Yaba with reliable Wi-Fi.</div>
+          <div class="sms-bubble holo typing" id="demo-typing">
+            <span class="dots"><span></span><span></span><span></span></span>
+          </div>
+          <div class="sms-bubble holo hidden" id="demo-reply">
+            ⚡ HoLo: Checked the live signal at Yaba lodges. Most are struggling with grid power tonight, but Caritas Inn
+            has a 91 Truth Score (Inverter + 45Mbps Fiber).
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- How It Works -->
+    <section class="section" id="how-it-works">
+      <div class="section-header">
+        <h2 class="section-title">How HoLo Works</h2>
+        <p class="section-subtitle">The honest engine behind every score</p>
+      </div>
+      <div class="steps-row">
+        <div class="step-card">
+          <div class="step-icon">📸</div>
+          <div class="step-num">01</div>
+          <h3>Scan & Join</h3>
+          <p>Scan the QR code to open the <strong>HoLo Chat</strong> portal—a familiar messaging interface designed for
+            the Lagos professional.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-card">
+          <div class="step-icon">📱</div>
+          <div class="step-num">02</div>
+          <h3>State Your Needs</h3>
+          <p>Describe what you're looking for in your own words. HoLo's AI parses your request to find the raw facts.
+          </p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-card">
+          <div class="step-icon">💳</div>
+          <div class="step-num">03</div>
+          <h3>Book & Pay</h3>
+          <p>When you've found the right truth, confirm via SMS. Paystack handles payment securely. Booking confirmed.
+          </p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-card">
+          <div class="step-icon">🎁</div>
+          <div class="step-num">04</div>
+          <h3>Verify & Earn</h3>
+          <p>After checkout, share your honest experience. Your verified vote earns a ₦100 airtime reward.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Roadmap / N-ATLAS -->
+    <section class="section reveal roadmap-section" id="roadmap">
+      <div class="section-header">
+        <h2 class="section-title">The Future of Truth</h2>
+        <p class="section-subtitle">Scaling HoLo with Sovereign Nigerian AI</p>
+      </div>
+      <div class="roadmap-container">
+        <div class="roadmap-flex">
+          <div class="roadmap-text">
+            <div class="roadmap-tag">Next Up: N-ATLAS Integration</div>
+            <h3 class="roadmap-title">N-ATLAS: <span class="accent">Nigeria's Multilingual Brain</span></h3>
+            <p class="roadmap-desc">
+              We are prepping HoLo for the next evolution by integrating <strong>N-ATLAS</strong>, Nigeria's Multimodal
+              LLM. This will unlock a truly local experience:
+            </p>
+            <ul class="roadmap-list">
+              <li>
+                <span class="check">✓</span>
+                <span><strong>Mother Tongue Search:</strong> Book in Yoruba, Hausa, or Igbo.</span>
+              </li>
+              <li>
+                <span class="check">✓</span>
+                <span><strong>Pidgin Nuance:</strong> Advanced sentiment analysis for local reviews.</span>
+              </li>
+              <li>
+                <span class="check">✓</span>
+                <span><strong>Voice Interactions:</strong> Send voice notes to rate your stay.</span>
+              </li>
+            </ul>
+          </div>
+          <div class="roadmap-preview">
+            <div class="preview-label">Preview: Multilingual Request</div>
+            <div class="preview-bubble">
+              "Mo fẹ́ yàrá kan ní Yábà..."
+            </div>
+            <div class="preview-stats">98% Accuracy</div>
+            <div class="preview-sub">via N-ATLAS Multimodal Engine</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <div class="footer-brand">
+      <a class="holo-logo" href="/" style="gap:16px;">
+        <div class="holo-badge"
+          style="width:60px;height:60px;box-shadow:0 0 28px rgba(0,207,255,0.45), inset 0 0 14px rgba(0,207,255,0.1);">
+          <svg width="28" height="28" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 11.5L8.5 16L18 7" stroke="#00CFFF" stroke-width="2.5" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </div>
+        <div class="holo-wordmark">
+          <div class="holo-name" style="font-size:28px;"><span class="w">Ho</span><span class="c">Lo</span></div>
+          <div class="holo-sub" style="font-size:12px;">Smart Checks</div>
+        </div>
+      </a>
+    </div>
+    <p>Verified Stays for the Lagos Professional · Lagos, Nigeria</p>
+    <p class="footer-stack">FastAPI · Gemini AI · Africa's Talking · Paystack</p>
+  </footer>
+
+  <script src="/static/main.js"></script>
+</body>
+
+</html>
