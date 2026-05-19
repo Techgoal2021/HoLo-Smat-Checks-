@@ -1,4 +1,14 @@
 {
+  "builds": [
+    {
+      "src": "backend/main.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "dashboard/**",
+      "use": "@vercel/static"
+    }
+  ],
   "rewrites": [
     { "source": "/", "destination": "/dashboard/index.html" },
     { "source": "/chat", "destination": "/dashboard/chat.html" },
@@ -7,6 +17,6 @@
     { "source": "/main.js", "destination": "/dashboard/main.js" },
     { "source": "/static/(.*)", "destination": "/dashboard/$1" },
     { "source": "/assets/(.*)", "destination": "/dashboard/$1" },
-    { "source": "/(.*)", "destination": "/api/index" }
+    { "source": "/(.*)", "destination": "/backend/main.py" }
   ]
 }
