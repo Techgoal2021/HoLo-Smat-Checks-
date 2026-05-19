@@ -71,33 +71,33 @@ app.include_router(dashboard.router)
 app.include_router(payments.router)
 app.include_router(auth.router)
 
-# Serve static dashboard files
-dashboard_path = Path(__file__).parent.parent / "dashboard"
-if dashboard_path.exists():
+# Serve static files from the public folder
+public_path = Path(__file__).parent.parent / "public"
+if public_path.exists():
     # Mount at /static for legacy references
-    app.mount("/static", StaticFiles(directory=str(dashboard_path)), name="static")
+    app.mount("/static", StaticFiles(directory=str(public_path)), name="static")
     # Mount at /assets so the dashboard can also be served as a directory
-    app.mount("/assets", StaticFiles(directory=str(dashboard_path)), name="assets")
+    app.mount("/assets", StaticFiles(directory=str(public_path)), name="assets")
 
     @app.get("/")
     async def serve_dashboard():
-        return FileResponse(str(dashboard_path / "index.html"))
+        return FileResponse(str(public_path / "index.html"))
 
     @app.get("/chat")
     async def serve_mobile_chat():
-        return FileResponse(str(dashboard_path / "chat.html"))
+        return FileResponse(str(public_path / "chat.html"))
 
     @app.get("/go")
-    async def serve_smart_landing():
-        return FileResponse(str(dashboard_path / "go.html"))
+    async def serve_qr_redirect():
+        return FileResponse(str(public_path / "go.html"))
 
     @app.get("/style.css")
-    async def serve_css():
-        return FileResponse(str(dashboard_path / "style.css"), media_type="text/css")
+    async def serve_style():
+        return FileResponse(str(public_path / "style.css"), media_type="text/css")
 
     @app.get("/main.js")
-    async def serve_js():
-        return FileResponse(str(dashboard_path / "main.js"), media_type="application/javascript")
+    async def serve_main_js():
+        return FileResponse(str(public_path / "main.js"), media_type="application/javascript")
 
     @app.post("/admin/trigger-vote")
     async def trigger_demo_vote(db: AsyncSession = Depends(get_db)):
