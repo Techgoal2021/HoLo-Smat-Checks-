@@ -1,22 +1,20 @@
 {
-  "builds": [
-    {
-      "src": "backend/main.py",
-      "use": "@vercel/python"
-    },
-    {
-      "src": "dashboard/**",
-      "use": "@vercel/static"
-    }
-  ],
   "rewrites": [
+    { "source": "/sms/(.*)", "destination": "/api/index" },
+    { "source": "/admin/(.*)", "destination": "/api/index" },
+    { "source": "/dashboard/stats", "destination": "/api/index" },
+    { "source": "/dashboard/hotels", "destination": "/api/index" },
+    { "source": "/dashboard/activity", "destination": "/api/index" },
+    { "source": "/dashboard/intelligence/update", "destination": "/api/index" },
+    { "source": "/payments/(.*)", "destination": "/api/index" },
+    { "source": "/auth/(.*)", "destination": "/api/index" },
+    { "source": "/health", "destination": "/api/index" },
     { "source": "/", "destination": "/dashboard/index.html" },
     { "source": "/chat", "destination": "/dashboard/chat.html" },
     { "source": "/go", "destination": "/dashboard/go.html" },
     { "source": "/style.css", "destination": "/dashboard/style.css" },
     { "source": "/main.js", "destination": "/dashboard/main.js" },
     { "source": "/static/(.*)", "destination": "/dashboard/$1" },
-    { "source": "/assets/(.*)", "destination": "/dashboard/$1" },
-    { "source": "/(.*)", "destination": "/backend/main.py" }
+    { "source": "/assets/(.*)", "destination": "/dashboard/$1" }
   ]
 }
