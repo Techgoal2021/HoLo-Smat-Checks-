@@ -4,10 +4,17 @@ from config import get_settings
 
 settings = get_settings()
 
-connect_args = {"statement_cache_size": 0} if "postgresql" in settings.database_url else {}
+# asyncpg handles SSL via connect_args, not URL params
+# Strip ?sslmode=require from URL if present (asyncpg doesn't support it)
+database_url = settings.database_url.split('?')[0]
+
+if "postgresql" in database_url:
+    connect_args = {"statement_cache_size": 0, "ssl": "require"}
+else:
+    connect_args = {}
 
 engine = create_async_engine(
-    settings.database_url,
+    database_url,
     echo=False,
     connect_args=connect_args
 )
